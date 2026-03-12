@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(curl -s http://localhost:5000/health)",
+      "Bash(curl -s http://localhost:5000/api/cars)",
+      "Bash(lsof -i :5000)",
+      "Bash(psql autospec_db -c \"SELECT COUNT\\(*\\) FROM cars;\")",
+      "WebFetch(domain:c.8891.com.tw)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

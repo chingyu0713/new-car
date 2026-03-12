@@ -1,0 +1,5 @@
+{
+  "name": "AutoSpec - Smart Car Database",
+  "description": "A comprehensive car comparison and search platform featuring AI-powered recommendations, specification comparison, and mock authentication.",
+  "requestFramePermissions": []
+}
