@@ -314,9 +314,18 @@ const USED_CARS: UsedCar[] = [
 ];
 
 async function runMigration(client: any) {
-  console.log('Running migration 002...');
+  console.log('Running migration 002 (add used car columns)...');
+
+  // Remove NOT NULL constraint from fuel_economy_id to allow used car data
+  await client.query(`
+    ALTER TABLE cars ALTER COLUMN fuel_economy_id DROP NOT NULL;
+    DROP INDEX IF EXISTS idx_cars_feid;
+  `);
+
+  // Add used car specific columns
   await client.query(`
     ALTER TABLE cars
+      ADD COLUMN IF NOT EXISTS external_id    VARCHAR(50),
       ADD COLUMN IF NOT EXISTS mileage        INTEGER,
       ADD COLUMN IF NOT EXISTS price          INTEGER,
       ADD COLUMN IF NOT EXISTS exterior_color VARCHAR(100),
@@ -324,7 +333,14 @@ async function runMigration(client: any) {
       ADD COLUMN IF NOT EXISTS condition      VARCHAR(50),
       ADD COLUMN IF NOT EXISTS location_city  VARCHAR(100),
       ADD COLUMN IF NOT EXISTS location_state VARCHAR(50),
-      ADD COLUMN IF NOT EXISTS description    TEXT;
+      ADD COLUMN IF NOT EXISTS description    TEXT,
+      ADD COLUMN IF NOT EXISTS body_type      VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS fuel_type      VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS transmission   VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS engine         VARCHAR(200),
+      ADD COLUMN IF NOT EXISTS horsepower     INTEGER,
+      ADD COLUMN IF NOT EXISTS msrp           INTEGER,
+      ADD COLUMN IF NOT EXISTS trim           VARCHAR(200);
     CREATE INDEX IF NOT EXISTS idx_cars_price     ON cars(price);
     CREATE INDEX IF NOT EXISTS idx_cars_condition ON cars(condition);
     CREATE INDEX IF NOT EXISTS idx_cars_mileage   ON cars(mileage);
