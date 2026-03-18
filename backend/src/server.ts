@@ -28,11 +28,26 @@ app.use((req, res, next) => {
 });
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  let dbStatus = 'unknown';
+  let dbError = null;
+  try {
+    const result = await pool.query('SELECT 1 as test');
+    dbStatus = result.rows[0]?.test === 1 ? 'connected' : 'error';
+  } catch (err: any) {
+    dbStatus = 'error';
+    dbError = err.message;
+  }
   res.json({
-    status: 'ok',
+    status: dbStatus === 'connected' ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    database: {
+      status: dbStatus,
+      error: dbError,
+      configured: !!process.env.DATABASE_URL,
+      host: process.env.DATABASE_URL?.match(/@([^:\/]+)/)?.[1] || 'unknown'
+    }
   });
 });
 
