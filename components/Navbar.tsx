@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
 const NAV: { to: string; label: string }[] = [
   { to: '/',     label: '首頁' },
-  { to: '/cars', label: '車款資料庫' },
+  { to: '/cars', label: '車款' },
 ];
 
 const SunIcon = () => (
@@ -28,9 +28,18 @@ const MoonIcon = () => (
 );
 
 const Navbar: React.FC = () => {
-  const { pathname }    = useLocation();
+  const { pathname } = useLocation();
   const { theme, toggle } = useTheme();
   const T = theme;
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <nav style={{
@@ -45,86 +54,93 @@ const Navbar: React.FC = () => {
       height:          56,
       display:         'flex',
       alignItems:      'center',
-      padding:         '0 32px',
+      justifyContent:  'space-between',
+      padding:         isMobile ? '0 12px' : '0 32px',
     }}>
-      {/* Logo */}
-      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 8, marginRight: 40 }}>
-        <span style={{ fontSize: 18, fontWeight: 800, color: T.gold, letterSpacing: '-0.5px' }}>新車誌</span>
-        <span style={{ fontSize: 10, color: T.muted, fontWeight: 600, letterSpacing: '0.15em' }}>AUTOMAG</span>
-      </Link>
+      {/* Left: Logo + Nav */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 24 }}>
+        {/* Logo */}
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: T.gold, letterSpacing: '-0.5px' }}>新車誌</span>
+          {!isMobile && <span style={{ fontSize: 10, color: T.muted, fontWeight: 600, letterSpacing: '0.15em' }}>AUTOMAG</span>}
+        </Link>
 
-      {/* Nav links */}
-      <div style={{ display: 'flex', gap: 4, flex: 1 }}>
-        {NAV.map(n => {
-          const active = n.to === '/'
-            ? pathname === '/'
-            : pathname.startsWith(n.to);
-          return (
-            <Link
-              key={n.to}
-              to={n.to}
-              style={{
-                padding:         '5px 12px',
-                borderRadius:    6,
-                fontSize:        14,
-                fontWeight:      active ? 600 : 400,
-                color:           active ? T.gold : T.muted,
-                textDecoration:  'none',
-                backgroundColor: active ? (T.mode === 'dark' ? 'rgba(232,197,71,0.1)' : 'rgba(184,146,10,0.08)') : 'transparent',
-              }}
-            >
-              {n.label}
-            </Link>
-          );
-        })}
+        {/* Nav links */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          {NAV.map(n => {
+            const active = n.to === '/'
+              ? pathname === '/'
+              : pathname.startsWith(n.to);
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                style={{
+                  padding:         isMobile ? '5px 8px' : '5px 12px',
+                  borderRadius:    6,
+                  fontSize:        isMobile ? 13 : 14,
+                  fontWeight:      active ? 600 : 400,
+                  color:           active ? T.gold : T.muted,
+                  textDecoration:  'none',
+                  backgroundColor: active ? (T.mode === 'dark' ? 'rgba(232,197,71,0.1)' : 'rgba(184,146,10,0.08)') : 'transparent',
+                }}
+              >
+                {n.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Theme toggle */}
-      <button
-        onClick={toggle}
-        title={T.mode === 'dark' ? '切換亮色主題' : '切換暗色主題'}
-        style={{
-          display:         'flex',
-          alignItems:      'center',
-          justifyContent:  'center',
-          width:           36,
-          height:          36,
-          borderRadius:    8,
-          border:          `1px solid ${T.border}`,
-          backgroundColor: T.card,
-          color:           T.muted,
-          cursor:          'pointer',
-          marginRight:     10,
-          flexShrink:      0,
-          transition:      'border-color 0.15s, color 0.15s',
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = T.gold;
-          (e.currentTarget as HTMLButtonElement).style.color       = T.gold;
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLButtonElement).style.borderColor = T.border;
-          (e.currentTarget as HTMLButtonElement).style.color       = T.muted;
-        }}
-      >
-        {T.mode === 'dark' ? <SunIcon /> : <MoonIcon />}
-      </button>
+      {/* Right: Theme toggle + CTA */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10 }}>
+        {/* Theme toggle */}
+        <button
+          onClick={toggle}
+          title={T.mode === 'dark' ? '切換亮色主題' : '切換暗色主題'}
+          style={{
+            display:         'flex',
+            alignItems:      'center',
+            justifyContent:  'center',
+            width:           isMobile ? 32 : 36,
+            height:          isMobile ? 32 : 36,
+            borderRadius:    8,
+            border:          `1px solid ${T.border}`,
+            backgroundColor: T.card,
+            color:           T.muted,
+            cursor:          'pointer',
+            flexShrink:      0,
+            transition:      'border-color 0.15s, color 0.15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = T.gold;
+            (e.currentTarget as HTMLButtonElement).style.color       = T.gold;
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = T.border;
+            (e.currentTarget as HTMLButtonElement).style.color       = T.muted;
+          }}
+        >
+          {T.mode === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </button>
 
-      {/* CTA */}
-      <Link
-        to="/cars"
-        style={{
-          padding:         '7px 18px',
-          borderRadius:    6,
-          fontSize:        13,
-          fontWeight:      600,
-          color:           T.mode === 'dark' ? '#0D0D0D' : '#FFFFFF',
-          backgroundColor: T.gold,
-          textDecoration:  'none',
-        }}
-      >
-        探索車款
-      </Link>
+        {/* CTA */}
+        <Link
+          to="/cars"
+          style={{
+            padding:         isMobile ? '6px 12px' : '7px 18px',
+            borderRadius:    6,
+            fontSize:        isMobile ? 12 : 13,
+            fontWeight:      600,
+            color:           T.mode === 'dark' ? '#0D0D0D' : '#FFFFFF',
+            backgroundColor: T.gold,
+            textDecoration:  'none',
+            whiteSpace:      'nowrap',
+          }}
+        >
+          {isMobile ? '探索' : '探索車款'}
+        </Link>
+      </div>
     </nav>
   );
 };
