@@ -326,10 +326,18 @@ export const getAllCars = async (req: Request, res: Response): Promise<void> => 
 
 export const getMakes = async (_req: Request, res: Response): Promise<void> => {
   try {
+    // Get unique makes, preferring rows that have make_zh
     const result = await pool.query(
-      `SELECT DISTINCT make, make_zh FROM cars ORDER BY make ASC`
+      `SELECT DISTINCT ON (make) make, make_zh
+       FROM cars
+       ORDER BY make ASC, make_zh NULLS LAST`
     );
-    res.json({ makes: result.rows.map((r: any) => ({ make: r.make, makeZh: r.make_zh })) });
+    // Use translation table as fallback for missing Chinese names
+    const makes = result.rows.map((r: any) => ({
+      make: r.make,
+      makeZh: r.make_zh || translateMake(r.make)
+    }));
+    res.json({ makes });
   } catch (err) {
     res.status(500).json({ error: '取得廠牌清單時發生錯誤' });
   }
