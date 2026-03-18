@@ -1,7 +1,9 @@
 import { FECar, FECarsResponse, FECarFilters, MakeOption, ClassOption, SiteStats } from '../types';
 
-// 本機開發用 localhost:5001，生產環境在 Vercel 設 VITE_API_URL
-const BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:5001') + '/api';
+// Production: Render backend, Development: localhost
+const BASE = import.meta.env.DEV
+  ? 'http://localhost:5001/api'
+  : 'https://autospec-backend.onrender.com/api';
 
 export async function fetchCars(filters: FECarFilters = {}, page = 1): Promise<FECarsResponse> {
   const p = new URLSearchParams();
