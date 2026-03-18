@@ -272,9 +272,13 @@ export const getAllCars = async (req: Request, res: Response): Promise<void> => 
     if (fuel_type) {
       const ft = (fuel_type as string).toLowerCase().trim();
       if (ft === 'regular gasoline') {
-        // 「汽油」選項涵蓋 regular + premium（前端已合併顯示）
-        conds.push(`fuel_type IN ($${p}, $${p + 1})`);
-        params.push('regular gasoline', 'premium gasoline'); p += 2;
+        // 「汽油」選項涵蓋 regular + premium + gasoline（前端已合併顯示）
+        conds.push(`(fuel_type ILIKE $${p} OR fuel_type ILIKE $${p + 1} OR fuel_type = $${p + 2})`);
+        params.push('%regular%gasoline%', '%premium%gasoline%', 'Gasoline'); p += 3;
+      } else if (ft === 'electricity') {
+        // 電動車包含 Electricity 和 Electric
+        conds.push(`(fuel_type ILIKE $${p} OR fuel_type ILIKE $${p + 1})`);
+        params.push('%electric%', '%electricity%'); p += 2;
       } else {
         conds.push(`fuel_type ILIKE $${p++}`);
         params.push(`%${fuel_type}%`);
