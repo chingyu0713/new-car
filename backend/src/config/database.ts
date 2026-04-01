@@ -5,9 +5,9 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// Enable SSL for AWS RDS or production environments
+// Enable SSL for AWS RDS or production environments (disable with DB_SSL=false for Docker)
 const isAWSRDS = process.env.DATABASE_URL?.includes('.rds.amazonaws.com');
-const requireSSL = process.env.NODE_ENV === 'production' || isAWSRDS;
+const requireSSL = process.env.DB_SSL === 'false' ? false : (process.env.NODE_ENV === 'production' || isAWSRDS);
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

@@ -3,9 +3,11 @@ import { HashRouter, Routes, Route, Link, useNavigate, useParams } from 'react-r
 import { FECar, SiteStats, mpgToKmL, mpgToL100, milesToKm, co2ToGkm } from './types';
 import { fetchCars, fetchCarById, fetchStats } from './services/carService';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import CarCard from './components/CarCard';
 import CarListPage from './pages/CarListPage';
+import AdminPage from './pages/AdminPage';
 
 // ─── Brands list ──────────────────────────────────────────────────────────────
 const BRANDS = [
@@ -507,13 +509,16 @@ const AppInner: React.FC = () => (
       <Route path="/"        element={<HomePage />} />
       <Route path="/cars"    element={<CarListPage />} />
       <Route path="/car/:id" element={<CarDetailPage />} />
+      <Route path="/admin"   element={<AdminPage />} />
     </Routes>
   </HashRouter>
 );
 
 const App: React.FC = () => (
   <ThemeProvider>
-    <AppInner />
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
   </ThemeProvider>
 );
 

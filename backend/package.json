@@ -7,8 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "postinstall": "npm run build",
-    "db:migrate": "node --loader tsx src/config/migrate.ts",
-    "db:migrate:new": "tsx src/config/runMigration.ts",
+    "db:migrate": "node --import tsx src/config/migrate.ts",
+    "db:reset": "tsx src/config/runMigration.ts",
     "db:seed": "tsx src/scripts/seedCars.ts"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
+    "@types/multer": "^2.1.0",
     "@types/node": "^20.10.5",
     "@types/pg": "^8.18.0",
     "@types/swagger-jsdoc": "^6.0.4",
@@ -26,6 +27,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
     "pg": "^8.11.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",

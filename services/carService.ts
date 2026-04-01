@@ -1,9 +1,5 @@
 import { FECar, FECarsResponse, FECarFilters, MakeOption, ClassOption, SiteStats } from '../types';
-
-// Production: Render backend, Development: localhost
-const BASE = import.meta.env.DEV
-  ? 'http://localhost:5001/api'
-  : 'https://autospec-backend.onrender.com/api';
+import { API_BASE as BASE } from './api';
 
 export async function fetchCars(filters: FECarFilters = {}, page = 1): Promise<FECarsResponse> {
   const p = new URLSearchParams();

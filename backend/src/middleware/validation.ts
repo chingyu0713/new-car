@@ -56,7 +56,4 @@ export const schemas = {
     features: z.array(z.string())
   }),
 
-  aiSearch: z.object({
-    query: z.string().min(1, '查詢不能為空')
-  })
 };

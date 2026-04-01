@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
     id: number;
     email: string;
     name: string;
+    role: string;
   };
 }
 
@@ -15,7 +16,7 @@ export const authenticateToken = (
   next: NextFunction
 ): void => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     res.status(401).json({ error: '未提供認證令牌' });
@@ -28,6 +29,7 @@ export const authenticateToken = (
       id: number;
       email: string;
       name: string;
+      role: string;
     };
 
     req.user = decoded;
@@ -53,6 +55,7 @@ export const optionalAuth = (
         id: number;
         email: string;
         name: string;
+        role: string;
       };
       req.user = decoded;
     } catch (error) {
@@ -60,5 +63,18 @@ export const optionalAuth = (
     }
   }
 
+  next();
+};
+
+// Admin-only middleware
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user || req.user.role !== 'admin') {
+    res.status(403).json({ error: '需要管理員權限' });
+    return;
+  }
   next();
 };
