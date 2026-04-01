@@ -237,25 +237,28 @@ const CarListPage: React.FC = () => {
           <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>
             {loading ? '載入中...' : data ? `共 ${data.total} 款車` : ''}
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {seedMsg && <span style={{ fontSize: 12, color: T.gold }}>{seedMsg}</span>}
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              style={{
-                padding:         '7px 14px',
-                borderRadius:    6,
-                fontSize:        12,
-                fontWeight:      600,
-                cursor:          seeding ? 'not-allowed' : 'pointer',
-                border:          `1px solid ${T.border}`,
-                backgroundColor: 'transparent',
-                color:           seeding ? T.muted : T.gold,
-              }}
-            >
-              {seeding ? '抓取中...' : '抓取車款資料'}
-            </button>
-          </div>
+          {/* Seed button only in dev mode */}
+          {import.meta.env.DEV && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {seedMsg && <span style={{ fontSize: 12, color: T.gold }}>{seedMsg}</span>}
+              <button
+                onClick={handleSeed}
+                disabled={seeding}
+                style={{
+                  padding:         '7px 14px',
+                  borderRadius:    6,
+                  fontSize:        12,
+                  fontWeight:      600,
+                  cursor:          seeding ? 'not-allowed' : 'pointer',
+                  border:          `1px solid ${T.border}`,
+                  backgroundColor: 'transparent',
+                  color:           seeding ? T.muted : T.gold,
+                }}
+              >
+                {seeding ? '抓取中...' : '抓取車款資料'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Error */}
@@ -341,26 +344,12 @@ const CarListPage: React.FC = () => {
         ) : !loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: 16 }}>
             <span style={{ fontSize: 56 }}>🚗</span>
-            <p style={{ fontSize: 20, fontWeight: 700, color: T.text, margin: 0 }}>找不到車款資料</p>
-            <p style={{ fontSize: 14, color: T.muted, textAlign: 'center', maxWidth: 360, margin: 0 }}>
-              {data?.total === 0 && !hasFilter
-                ? '資料庫是空的，請點擊「抓取車款資料」從 FuelEconomy.gov 載入資料'
-                : '試試看調整篩選條件'}
+            <p style={{ fontSize: 20, fontWeight: 700, color: T.text, margin: 0 }}>
+              {hasFilter ? '找不到符合條件的車款' : '載入中...'}
             </p>
-            {!hasFilter && (
-              <button onClick={handleSeed} disabled={seeding} style={{
-                padding:         '10px 24px',
-                borderRadius:    8,
-                backgroundColor: T.gold,
-                color:           T.mode === 'dark' ? '#0D0D0D' : '#FFFFFF',
-                fontSize:        14,
-                fontWeight:      700,
-                border:          'none',
-                cursor:          seeding ? 'not-allowed' : 'pointer',
-              }}>
-                {seeding ? '抓取中...' : '立即從 FuelEconomy.gov 抓取'}
-              </button>
-            )}
+            <p style={{ fontSize: 14, color: T.muted, textAlign: 'center', maxWidth: 360, margin: 0 }}>
+              {hasFilter ? '試試看調整篩選條件' : '請稍候，正在連接伺服器'}
+            </p>
             {hasFilter && (
               <button onClick={reset} style={{
                 backgroundColor: 'transparent',
