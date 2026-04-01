@@ -24,7 +24,7 @@ export const authenticateToken = (
   }
 
   try {
-    const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+    const JWT_SECRET = process.env.JWT_SECRET || '';
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: number;
       email: string;
@@ -50,7 +50,7 @@ export const optionalAuth = (
 
   if (token) {
     try {
-      const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+      const JWT_SECRET = process.env.JWT_SECRET || '';
       const decoded = jwt.verify(token, JWT_SECRET) as {
         id: number;
         email: string;

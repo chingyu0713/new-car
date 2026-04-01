@@ -23,8 +23,11 @@ export const validate = (schema: z.ZodSchema) => {
 export const schemas = {
   register: z.object({
     email: z.string().email('無效的電子郵件格式'),
-    password: z.string().min(6, '密碼至少需要6個字元'),
-    name: z.string().min(1, '姓名不能為空')
+    password: z.string()
+      .min(8, '密碼至少需要 8 個字元')
+      .regex(/[A-Za-z]/, '密碼需包含英文字母')
+      .regex(/[0-9]/, '密碼需包含數字'),
+    name: z.string().min(1, '姓名不能為空').max(50, '姓名過長')
   }),
 
   login: z.object({

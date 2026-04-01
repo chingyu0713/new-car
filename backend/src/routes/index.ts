@@ -1,4 +1,5 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import * as carController from '../controllers/carController.js';
 import * as favoriteController from '../controllers/favoriteController.js';
@@ -10,10 +11,19 @@ import { validate, schemas } from '../middleware/validation.js';
 
 const router = express.Router();
 
+// Auth rate limit: 5 attempts per 15 minutes per IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: '登入嘗試過多，請 15 分鐘後再試' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // ── Auth ──────────────────────────────────────────────────────────
-router.post('/auth/register', validate(schemas.register), authController.register);
-router.post('/auth/login',    validate(schemas.login),    authController.login);
-router.post('/auth/google',   authController.googleAuth);
+router.post('/auth/register', authLimiter, validate(schemas.register), authController.register);
+router.post('/auth/login',    authLimiter, validate(schemas.login),    authController.login);
+router.post('/auth/google',   authLimiter, authController.googleAuth);
 
 // ── Cars — static routes BEFORE :id ──────────────────────────────
 router.get('/cars/makes',        carController.getMakes);

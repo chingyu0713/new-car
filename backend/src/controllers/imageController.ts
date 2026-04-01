@@ -28,24 +28,29 @@ const storage = multer.diskStorage({
   },
 });
 
+const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+
 const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  if (file.mimetype.startsWith('image/')) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ALLOWED_MIME.includes(file.mimetype) && ALLOWED_EXT.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('只允許上傳圖片檔案'));
+    cb(new Error('只允許上傳 JPG、PNG、WebP、GIF 圖片'));
   }
 };
 
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
 // ── POST /api/admin/cars/:id/images — upload images ──────────────────────
 export const uploadImages = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const carId = req.params.id;
+    const carId = parseInt(req.params.id, 10);
+    if (isNaN(carId) || carId < 1) { res.status(400).json({ error: '無效的車款 ID' }); return; }
     const slot = (req.body.slot || 'main') as string;
 
     if (!['main', 'banner', 'detail'].includes(slot)) {

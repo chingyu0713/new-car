@@ -6,9 +6,9 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: autospec_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-autospec_db}
     volumes:
       - autospec_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -25,12 +25,14 @@ services:
       - "5001:5001"
     environment:
       PORT: 5001
-      NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/autospec_db
-      JWT_SECRET: autospec-super-secret-jwt-key-2024
-      JWT_EXPIRES_IN: 7d
-      BACKEND_URL: http://localhost:5001
-      DB_SSL: "false"
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-autospec_db}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-random-64-chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@autospec.dev}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:5001}
+      DB_SSL: ${DB_SSL:-false}
     volumes:
       - autospec_uploads:/app/uploads
     depends_on:
@@ -49,15 +51,17 @@ services:
     depends_on:
       - backend
 
+  # pgAdmin: only for development, remove in production
   pgadmin:
     image: dpage/pgadmin4
     container_name: autospec-pgadmin
     restart: unless-stopped
+    profiles: ["dev"]
     ports:
       - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@autospec.dev
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@autospec.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     depends_on:
       - db
 
