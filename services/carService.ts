@@ -1,9 +1,5 @@
 import { FECar, FECarsResponse, FECarFilters, MakeOption, ClassOption, SiteStats } from '../types';
-
-// Production: Render backend, Development: localhost
-const BASE = import.meta.env.DEV
-  ? 'http://localhost:5001/api'
-  : 'https://autospec-backend.onrender.com/api';
+import { API_BASE as BASE } from './api';
 
 // Retry wrapper for cold start handling (Render free tier sleeps after 15min)
 async function fetchWithRetry<T>(

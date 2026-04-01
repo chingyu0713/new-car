@@ -218,6 +218,20 @@ async function upsertVehicle(v: any): Promise<void> {
   );
 }
 
+function resolveImageUrl(url: string | null): string | null {
+  if (!url) return null;
+  // Local uploads: in production (Docker), nginx proxies /uploads/ to backend,
+  // so relative path works. In dev, prepend backend host.
+  if (url.startsWith('/uploads/')) {
+    if (process.env.NODE_ENV !== 'production') {
+      return `http://localhost:${process.env.PORT || 5001}${url}`;
+    }
+    // In production/Docker, return as-is — nginx will proxy
+    return url;
+  }
+  return url;
+}
+
 function formatCar(row: any) {
   return {
     id:             row.id,
@@ -246,9 +260,9 @@ function formatCar(row: any) {
     rangeCity:      row.range_city,
     rangeHighway:   row.range_highway,
     co2:            row.co2,
-    imageUrl:       row.image_url,
-    imageUrlBanner: row.image_url_banner,
-    imageUrlDetail: row.image_url_detail,
+    imageUrl:       resolveImageUrl(row.image_url),
+    imageUrlBanner: resolveImageUrl(row.image_url_banner),
+    imageUrlDetail: resolveImageUrl(row.image_url_detail),
     cachedAt:       row.cached_at,
   };
 }

@@ -49,9 +49,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Create user
     const result = await pool.query(
-      `INSERT INTO users (email, password_hash, name)
-       VALUES ($1, $2, $3)
-       RETURNING id, email, name, created_at`,
+      `INSERT INTO users (email, password_hash, name, role)
+       VALUES ($1, $2, $3, 'user')
+       RETURNING id, email, name, role, created_at`,
       [email, password_hash, name]
     );
 
@@ -59,7 +59,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN as any }
     );
@@ -69,7 +69,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role
       },
       token
     });
@@ -107,7 +108,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Find user
     const result = await pool.query(
-      'SELECT id, email, name, password_hash FROM users WHERE email = $1',
+      'SELECT id, email, name, password_hash, role FROM users WHERE email = $1',
       [email]
     );
 
@@ -128,7 +129,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN as any }
     );
@@ -138,7 +139,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role
       },
       token
     });
@@ -194,7 +196,7 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
 
     // Generate JWT
     const token = jwt.sign(
-      { id: userData.id, email: userData.email, name: userData.name },
+      { id: userData.id, email: userData.email, name: userData.name, role: userData.role || 'user' },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN as any }
     );
@@ -205,6 +207,7 @@ export const googleAuth = async (req: Request, res: Response): Promise<void> => 
         id: userData.id,
         email: userData.email,
         name: userData.name,
+        role: userData.role || 'user',
         avatar: userData.avatar_url
       },
       token
