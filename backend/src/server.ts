@@ -28,12 +28,20 @@ app.use(helmet({
 }));
 
 // CORS
-const allowedOrigins = isProd
-  ? [FRONTEND_URL]
-  : ['http://localhost:3000', 'http://localhost:5173'];
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  FRONTEND_URL,
+].filter(Boolean).map(u => u.trim());
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
   credentials: true
 }));
 
