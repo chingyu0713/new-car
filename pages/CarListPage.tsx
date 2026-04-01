@@ -83,7 +83,7 @@ const CarListPage: React.FC = () => {
     try {
       setData(await fetchCars(buildApiFilters(fl), pg));
     } catch {
-      setError('無法連接後端伺服器，請確認後端已啟動 (port 5001)');
+      setError('伺服器正在喚醒中，請稍候幾秒後重新整理頁面');
     } finally {
       setLoading(false);
     }
